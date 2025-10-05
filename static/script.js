@@ -1,8 +1,23 @@
+// Global variables to store chart instances
+let noiseChartInstance = null;
+let eveChartInstance = null;
+
 function switchTab(tabName) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
     
-    event.target.classList.add('active');
+    // NOTE: 'event' is not defined unless passed in or accessed via window.event.
+    // For robust use, you should ensure the function receives the event object, 
+    // or use a closure/anonymous function to access it. Assuming it's called 
+    // directly from an event listener where 'event' is available.
+    if (typeof event !== 'undefined' && event.target) {
+        event.target.classList.add('active');
+    } else {
+        // Fallback for direct calls if 'event' isn't available
+        const btn = document.querySelector(`.tab-btn[onclick="switchTab('${tabName}')"]`);
+        if (btn) btn.classList.add('active');
+    }
+
     document.getElementById(`${tabName}-tab`).classList.add('active');
 }
 
@@ -34,8 +49,9 @@ document.getElementById('sim-form').addEventListener('submit', async (e) => {
         document.getElementById('detected_eve').textContent = data.detected_eve ? 'Yes' : 'No';
         document.getElementById('detected_eve').style.color = data.detected_eve ? 'red' : 'green';
         
-        document.getElementById('alice_key').textContent = data.alice_final_key.slice(0, 20).join('');
-        document.getElementById('bob_key').textContent = data.bob_final_key.slice(0, 20).join('');
+        // Ensure keys are displayed cleanly (handle empty arrays gracefully)
+        document.getElementById('alice_key').textContent = data.alice_final_key.slice(0, 20).join('') || 'Key not established';
+        document.getElementById('bob_key').textContent = data.bob_final_key.slice(0, 20).join('') || 'Key not established';
         
         document.getElementById('results').style.display = 'block';
     } catch (error) {
@@ -66,9 +82,15 @@ document.getElementById('analysis-form').addEventListener('submit', async (e) =>
         
         const data = await response.json();
         
-        // Noise Chart
+        // --- NOISE CHART FIX ---
         const noiseCtx = document.getElementById('noiseChart').getContext('2d');
-        new Chart(noiseCtx, {
+        // Check if an instance already exists and destroy it
+        if (noiseChartInstance) {
+            noiseChartInstance.destroy();
+        }
+
+        // Create the new Noise Chart instance and store it
+        noiseChartInstance = new Chart(noiseCtx, {
             type: 'line',
             data: {
                 labels: data.noise.x,
@@ -105,9 +127,15 @@ document.getElementById('analysis-form').addEventListener('submit', async (e) =>
             }
         });
         
-        // Eve Chart
+        // --- EVE CHART FIX ---
         const eveCtx = document.getElementById('eveChart').getContext('2d');
-        new Chart(eveCtx, {
+        // Check if an instance already exists and destroy it
+        if (eveChartInstance) {
+            eveChartInstance.destroy();
+        }
+
+        // Create the new Eve Chart instance and store it
+        eveChartInstance = new Chart(eveCtx, {
             type: 'line',
             data: {
                 labels: data.eve.x,
@@ -168,6 +196,8 @@ document.getElementById('analysis-form').addEventListener('submit', async (e) =>
         
         document.getElementById('charts').style.display = 'block';
     } catch (error) {
+        // The alert here will now display any network or server-side error, 
+        // as the client-side chart error is handled.
         alert('Error running analysis: ' + error.message);
     } finally {
         document.getElementById('loading').style.display = 'none';
