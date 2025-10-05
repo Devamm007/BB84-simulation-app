@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BB84 QKD Protocol Simulator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>BB84 Quantum Key Distribution Protocol Simulator</h1>
+            <p>Simulate and visualize quantum cryptography protocols</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('single')">Single Simulation</button>
+            <button class="tab-btn" onclick="switchTab('analysis')">Statistical Analysis</button>
+        </div>
+
+        <!-- Single Simulation Tab -->
+        <div id="single-tab" class="tab-content active">
+            <div class="card">
+                <h2>Simulation Parameters</h2>
+                <form id="sim-form">
+                    <div class="form-group">
+                        <label for="n_qubits">Number of Qubits:</label>
+                        <input type="number" id="n_qubits" name="n_qubits" value="10" min="1" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="noise_prob">Noise Probability (0-1):</label>
+                        <input type="number" id="noise_prob" name="noise_prob" value="0.0" min="0" max="1" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="eve_prob">Eavesdropper Probability (0-1):</label>
+                        <input type="number" id="eve_prob" name="eve_prob" value="0.0" min="0" max="1" step="0.01">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Run Simulation</button>
+                </form>
+            </div>
+
+            <div id="results" class="card" style="display:none;">
+                <h2>Simulation Results</h2>
+                <div class="results-grid">
+                    <div class="result-item">
+                        <span class="result-label">QBER:</span>
+                        <span id="qber" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Sifted Key Length:</span>
+                        <span id="sifted_length" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Final Key Length:</span>
+                        <span id="key_length" class="result-value"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Eavesdropper Detected:</span>
+                        <span id="detected_eve" class="result-value"></span>
+                    </div>
+                </div>
+                <div class="key-display">
+                    <h3>Generated Keys (First 20 bits)</h3>
+                    <div>
+                        <strong>Alice's Key:</strong> <code id="alice_key"></code>
+                    </div>
+                    <div>
+                        <strong>Bob's Key:</strong> <code id="bob_key"></code>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis Tab -->
+        <div id="analysis-tab" class="tab-content">
+            <div class="card">
+                <h2>Statistical Analysis Parameters</h2>
+                <form id="analysis-form">
+                    <div class="form-group">
+                        <label for="n_runs">Number of Runs:</label>
+                        <input type="number" id="n_runs" name="n_runs" value="10" min="1" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="n_qubits_analysis">Number of Qubits per Run:</label>
+                        <input type="number" id="n_qubits_analysis" name="n_qubits" value="25" min="1" max="100">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Run Analysis</button>
+                </form>
+            </div>
+
+            <div id="charts" class="card" style="display:none;">
+                <h2>Analysis Results</h2>
+                <div class="chart-container">
+                    <canvas id="noiseChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="eveChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div id="loading" class="loading" style="display:none;">
+            <div class="spinner"></div>
+            <p>Running simulation...</p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
