@@ -1,4 +1,3 @@
 Flask==3.0.0
 numpy==1.26.2
 qiskit==1.0.0
-qiskit-aer==0.13.3
